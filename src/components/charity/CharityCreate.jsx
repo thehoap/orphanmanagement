@@ -6,6 +6,10 @@ import DatePicker from "react-datepicker";
 import { CharityContext } from "../../contexts/CharityContext";
 import { storage } from "../../firebase";
 import "../../scss/abstracts/_form.scss";
+import { useForm } from "react-hook-form";
+import {
+    REGEX_ADDRESS,
+} from "../utils/regex";
 
 const CharityCreate = () => {
     const { addCharity } = useContext(CharityContext);
@@ -18,7 +22,11 @@ const CharityCreate = () => {
         content: "",
         isCompleted: true,
     });
-
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
     const [imageSuccess, setImageSuccess] = useState("");
     const [pickerDateStart, setPickerDateStart] = useState("");
     const [pickerDateEnd, setPickerDateEnd] = useState("");
@@ -39,16 +47,16 @@ const CharityCreate = () => {
         isCompleted,
         title,
     } = newCharity;
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = (data) => {
+        console.log(data);
         addCharity(
-            charityName,
+            data.charityName,
             content,
             dateEnd,
             dateStart,
             image,
             isCompleted,
-            title
+            data.title
         );
     };
 
@@ -129,30 +137,49 @@ const CharityCreate = () => {
                     <p className="image__success">{imageSuccess}</p>
                 )}
             </Form.Group>
-            <Form onSubmit={handleSubmit} className="form" id="charityCreate">
+            <Form
+                onSubmit={handleSubmit(onSubmit)}
+                className="form"
+                id="charityCreate"
+            >
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
                         className="form-control"
                         type="text"
                         placeholder="Tên sự kiện"
                         name="charityName"
-                        value={charityName}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("charityName", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
-
+                {errors.charityName && (
+                    <p className="form__message">
+                        Tên sự kiện không được chứa ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
                         className="form-control"
                         type="text"
                         placeholder="Chủ đề"
                         name="title"
-                        value={title}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("title", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
+                {errors.title && (
+                    <p className="form__message">
+                        Chủ đề không được chứa số, ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Row className="mb-3">
                     <Form.Group as={Col} className="form-group">
                         <DatePicker

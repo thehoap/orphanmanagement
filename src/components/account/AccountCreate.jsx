@@ -6,9 +6,22 @@ import DatePicker from "react-datepicker";
 import { AccountContext } from "../../contexts/AccountContext";
 import { storage } from "../../firebase";
 import "../../scss/abstracts/_form.scss";
+import { useForm } from "react-hook-form";
+import {
+    REGEX_ADDRESS,
+    REGEX_EMAIL,
+    REGEX_NAME,
+    REGEX_NUMBER_ONLY,
+    REGEX_PHONE,
+} from "../utils/regex";
 
 const AccountCreate = () => {
     const { addAccount } = useContext(AccountContext);
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
     const [newAccount, setNewAccount] = useState({
         image: "",
         fullName: "",
@@ -42,18 +55,18 @@ const AccountCreate = () => {
         phone,
         email,
     } = newAccount;
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = (data) => {
+        console.log(data);
         addAccount(
             image,
-            fullName,
+            data.fullName,
             date_of_birth,
             gender,
             roles,
-            address,
-            identification,
-            phone,
-            email,
+            data.address,
+            data.identification,
+            data.phone,
+            data.email
         );
     };
 
@@ -134,18 +147,30 @@ const AccountCreate = () => {
                     <p className="image__success">{imageSuccess}</p>
                 )}
             </Form.Group>
-            <Form onSubmit={handleSubmit} className="form" id="accountCreate">
+            <Form
+                onSubmit={handleSubmit(onSubmit)}
+                className="form"
+                id="accountCreate"
+            >
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
                         className="form-control"
                         type="text"
                         placeholder="Họ và tên"
                         name="fullName"
-                        value={fullName}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("fullName", {
+                            required: true,
+                            pattern: REGEX_NAME,
+                        })}
                     />
                 </Form.Group>
+                {errors.fullName && (
+                    <p className="form__message">
+                        Tên không được chứa số, ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Row className="mb-3">
                     <Form.Group as={Col} className="form-group">
                         <DatePicker
@@ -165,7 +190,7 @@ const AccountCreate = () => {
                                 });
                                 setPickerDate(date);
                             }}
-                            required
+                            // required
                         />
                     </Form.Group>
                     <Form.Group as={Col} className="form-group">
@@ -232,49 +257,83 @@ const AccountCreate = () => {
                         type="text"
                         placeholder="Địa chỉ"
                         name="address"
-                        value={address}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("address", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
-
+                {errors.address && (
+                    <p className="form__message">
+                        Địa chỉ không được chứa ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Row className="mb-3">
                     <Form.Group as={Col} className="form-group">
-                        <Form.Control
+                        <input
                             className="form-control"
                             type="text"
                             placeholder="CMND/CCCD"
                             name="identification"
-                            value={identification}
                             onChange={(e) => onInputChange(e)}
-                            required
+                            {...register("identification", {
+                                required: true,
+                                minLength: 9,
+                                maxLength: 10,
+                                pattern: REGEX_NUMBER_ONLY,
+                            })}
                         />
                     </Form.Group>
-
                     <Form.Group as={Col} className="form-group">
                         <Form.Control
                             className="form-control"
                             type="text"
                             placeholder="Số điện thoại"
                             name="phone"
-                            value={phone}
                             onChange={(e) => onInputChange(e)}
-                            required
+                            {...register("phone", {
+                                required: true,
+                                pattern: REGEX_PHONE,
+                            })}
                         />
                     </Form.Group>
                 </Row>
-
+                {(errors.identification || errors.phone) && (
+                    <Row>
+                        {errors.identification && (
+                            <Form.Label as={Col} className="form__message">
+                                CMND/CCCD chứa 9-10 số
+                            </Form.Label>
+                        )}
+                        {errors.phone && (
+                            <Form.Label as={Col} className="form__message">
+                                Đầu số điện thoại phải thuộc các nhà mạng tại
+                                Việt Nam
+                            </Form.Label>
+                        )}
+                    </Row>
+                )}
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
                         className="form-control"
                         type="email"
                         placeholder="Email"
                         name="email"
-                        value={email}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("email", {
+                            required: true,
+                            pattern: REGEX_EMAIL,
+                        })}
                     />
                 </Form.Group>
+                {errors.email && (
+                    <p className="mb-0 form__message">
+                        Tên người dùng chỉ chứa chữ cái, chữ số và dấu chấm xuất
+                        hiện ở giữa
+                    </p>
+                )}
             </Form>
         </>
     );

@@ -108,7 +108,15 @@ const EmployeeContextProvider = (props) => {
             .then((response) => response.json())
             .then((result) => {
                 console.log(result);
-                getEmployeesList(currentPage);
+                if (result.code === 200) {
+                    getEmployeesList(currentPage);
+                } else if (result.error === "ERROR_EMAIL_ALREADY_EXIST") {
+                    alert("Email đã tồn tại");
+                } else if (
+                    result.error === "ERROR_IDENTIFICATION_ALREADY_EXIST"
+                ) {
+                    alert("CMND/CCCD đã tồn tại");
+                }
             })
             .catch((error) => console.log("error", error));
     }

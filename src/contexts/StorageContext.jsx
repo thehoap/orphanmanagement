@@ -123,7 +123,7 @@ const StorageContextProvider = (props) => {
             `https://orphanmanagement.herokuapp.com/api/v1/admin/${id}`,
             requestOptions
         )
-            .then((response) => response.text())
+            .then((response) => response.json())
             .then((result) => {
                 console.log(result);
                 getStoragesList(currentPage);

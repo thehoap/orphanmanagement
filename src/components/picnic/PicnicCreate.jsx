@@ -6,6 +6,8 @@ import DatePicker from "react-datepicker";
 import { PicnicContext } from "../../contexts/PicnicContext";
 import { storage } from "../../firebase";
 import "../../scss/abstracts/_form.scss";
+import { useForm } from "react-hook-form";
+import { REGEX_ADDRESS } from "../utils/regex";
 
 const PicnicCreate = () => {
     const { addPicnic } = useContext(PicnicContext);
@@ -32,6 +34,11 @@ const PicnicCreate = () => {
         console.log(newPicnic);
     };
     const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
+    const {
         image,
         namePicnic,
         title,
@@ -41,15 +48,14 @@ const PicnicCreate = () => {
         content,
         personInChargeId = [0],
     } = newPicnic;
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = (data) => {
         addPicnic(
             image,
-            namePicnic,
-            title,
+            data.namePicnic,
+            data.title,
             dateStart,
             dateEnd,
-            address,
+            data.address,
             content,
             personInChargeId
         );
@@ -132,18 +138,30 @@ const PicnicCreate = () => {
                     <p className="image__success">{imageSuccess}</p>
                 )}
             </Form.Group>
-            <Form onSubmit={handleSubmit} className="form" id="picnicCreate">
+            <Form
+                onSubmit={handleSubmit(onSubmit)}
+                className="form"
+                id="picnicCreate"
+            >
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
                         className="form-control"
                         type="text"
                         placeholder="Tên sự kiện"
                         name="namePicnic"
-                        value={namePicnic}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("namePicnic", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
+                {errors.namePicnic && (
+                    <p className="form__message">
+                        Tên sự kiện không được chứa ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
 
                 <Form.Group className="mb-3 form-group">
                     <Form.Control
@@ -151,24 +169,38 @@ const PicnicCreate = () => {
                         type="text"
                         placeholder="Chủ đề"
                         name="title"
-                        value={title}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("title", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
-
+                {errors.title && (
+                    <p className="form__message">
+                        Chủ đề không được chứa ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Form.Group className="form-group mb-3">
                     <Form.Control
                         className="form-control"
                         type="text"
                         placeholder="Địa điểm"
                         name="address"
-                        value={address}
                         onChange={(e) => onInputChange(e)}
-                        required
+                        {...register("address", {
+                            required: true,
+                            pattern: REGEX_ADDRESS,
+                        })}
                     />
                 </Form.Group>
-
+                {errors.address && (
+                    <p className="form__message">
+                        Địa chỉ không được chứa ký tự đặc biệt và không có
+                        khoảng trắng ở 2 đầu
+                    </p>
+                )}
                 <Row className="mb-3">
                     <Form.Group as={Col} className="form-group">
                         <DatePicker

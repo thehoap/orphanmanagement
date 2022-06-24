@@ -8,12 +8,24 @@ import { storage } from "../../firebase";
 import "../../scss/abstracts/_form.scss";
 import { SearchBar } from "../search/SearchBar";
 import "./_children.scss";
+import { useForm } from "react-hook-form";
+import {
+    REGEX_ADDRESS,
+    REGEX_EMAIL,
+    REGEX_NAME,
+    REGEX_NUMBER_ONLY,
+    REGEX_PHONE,
+} from "../utils/regex";
 
 const ChildrenCreate = () => {
     const { addChildren } = useContext(ChildrenContext);
     const { introducers } = useContext(ChildrenContext);
     const { nurturers } = useContext(ChildrenContext);
-
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm();
     const [newChildren, setNewChildren] = useState({
         image: "",
         fullName: "",
@@ -59,11 +71,10 @@ const ChildrenCreate = () => {
         introductoryDate,
         adoptiveDate,
     } = newChildren;
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const onSubmit = (data) => {
         addChildren(
             image,
-            fullName,
+            data.fullName,
             gender,
             dateOfBirth,
             introductoryDate,
@@ -110,7 +121,11 @@ const ChildrenCreate = () => {
         });
     }
     return (
-        <Form onSubmit={handleSubmit} className="form" id="childrenCreate">
+        <Form
+            onSubmit={handleSubmit(onSubmit)}
+            className="form"
+            id="childrenCreate"
+        >
             <Form.Group className="mb-3 form-group">
                 <img
                     className="image"
@@ -156,11 +171,19 @@ const ChildrenCreate = () => {
                     type="text"
                     placeholder="Họ và tên"
                     name="fullName"
-                    value={fullName}
                     onChange={(e) => onInputChange(e)}
-                    required
+                    {...register("fullName", {
+                        required: true,
+                        pattern: REGEX_NAME,
+                    })}
                 />
             </Form.Group>
+            {errors.fullName && (
+                <p className="form__message">
+                    Tên không được chứa số, ký tự đặc biệt và không có khoảng
+                    trắng ở 2 đầu
+                </p>
+            )}
             <Row className="mb-3">
                 <Form.Group as={Col} className="form-group">
                     <DatePicker
