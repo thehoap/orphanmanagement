@@ -18,7 +18,7 @@
     "react-chartjs-2": "^4.1.0",
     "react-datepicker": "^4.7.0",
     "react-dom": "^18.0.0",
-    "react-hook-form": "^7.31.3",
+    "react-hook-form": "^7.33.0",
     "react-meta-tags": "^1.0.1",
     "react-modal-resizable-draggable": "^0.1.6",
     "react-paginate": "^8.1.3",
