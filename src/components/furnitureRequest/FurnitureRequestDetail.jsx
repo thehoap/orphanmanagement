@@ -178,7 +178,7 @@ const FurnitureRequestDetail = ({ furnitureRequestId }) => {
                             Trở về
                         </Button>
                 </div>
-                <div className="span2">
+                {/* <div className="span2">
                 <Button
                             variant="success"
                             onClick={(e) => {
@@ -189,7 +189,7 @@ const FurnitureRequestDetail = ({ furnitureRequestId }) => {
                         >
                             Cập nhật
                         </Button>
-                </div>
+                </div> */}
 
             </div>
         </Card>
